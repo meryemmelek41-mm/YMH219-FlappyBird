@@ -17,7 +17,7 @@ Bu proje, Windows Forms üzerinde zamanlayıcı (Timer) ve klavye olaylarının 
 
 1. Bu depoyu klonlayın:
    ```bash
-   git clone https://github.com/KULLANICI_ADIN/YMH219-FlappyBird.git
+   git clone https://github.com/meryemmelek41-mm/YMH219-FlappyBird.git
    ```
 2. `FlappyBird.sln` dosyasını Visual Studio ile açın.
 3. `F5` tuşuna basarak veya **Debug > Start Debugging** ile çalıştırın.
@@ -84,6 +84,6 @@ FlappyBird/
 
 ---
 
-**Öğrenci:** [Adınız Soyadınız]  
-**Öğrenci No:** [Öğrenci Numaranız]  
+**Öğrenci:** Meryem Melek Şimşek  
+**Öğrenci No:** 250541017  
 **Ders:** Nesne Tabanlı Programlama (YMH 219)
