@@ -8,4 +8,8 @@
     <AssemblyName>FlappyBird</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\bird.png" />
+  </ItemGroup>
+
 </Project>

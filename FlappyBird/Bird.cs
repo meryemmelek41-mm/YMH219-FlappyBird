@@ -1,11 +1,15 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Reflection;
 
 namespace FlappyBird
 {
     /// <summary>
     /// Kuş nesnesini temsil eden sınıf.
     /// Konum, hız, yer çekimi ve çizim işlemlerini yönetir.
+    /// Harici bir kuş görseli (bird.png) kullanır.
     /// </summary>
     public class Bird
     {
@@ -13,8 +17,8 @@ namespace FlappyBird
         public float X { get; set; }
         public float Y { get; set; }
         public float Velocity { get; set; }
-        public int Width { get; } = 34;
-        public int Height { get; } = 24;
+        public int Width { get; } = 45;
+        public int Height { get; } = 35;
         public bool IsAlive { get; set; } = true;
 
         // --- Sabitler ---
@@ -22,12 +26,11 @@ namespace FlappyBird
         private const float JumpForce = -8f;
         private const float MaxFallSpeed = 10f;
 
-        // Kanat animasyonu
-        private int wingFrame = 0;
-        private int wingDirection = 1;
+        // Kuş görseli
+        private Image birdImage;
 
         /// <summary>
-        /// Kuş nesnesini başlangıç konumunda oluşturur.
+        /// Kuş nesnesini başlangıç konumunda oluşturur ve görseli yükler.
         /// </summary>
         public Bird(float startX, float startY)
         {
@@ -35,6 +38,30 @@ namespace FlappyBird
             Y = startY;
             Velocity = 0;
             IsAlive = true;
+            LoadBirdImage();
+        }
+
+        /// <summary>
+        /// Gömülü kaynak (embedded resource) olarak kuş görselini yükler.
+        /// </summary>
+        private void LoadBirdImage()
+        {
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                using (Stream stream = assembly.GetManifestResourceStream("FlappyBird.Resources.bird.png"))
+                {
+                    if (stream != null)
+                    {
+                        birdImage = Image.FromStream(stream);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Görsel yüklenemezse kod ile çizim yapılır
+                birdImage = null;
+            }
         }
 
         /// <summary>
@@ -43,7 +70,7 @@ namespace FlappyBird
         public RectangleF GetBounds()
         {
             // Biraz küçültülmüş hitbox (daha adil oynanış)
-            return new RectangleF(X + 3, Y + 3, Width - 6, Height - 6);
+            return new RectangleF(X + 4, Y + 4, Width - 8, Height - 8);
         }
 
         /// <summary>
@@ -70,69 +97,101 @@ namespace FlappyBird
                 Velocity = MaxFallSpeed;
 
             Y += Velocity;
-
-            // Kanat animasyonu
-            wingFrame += wingDirection;
-            if (wingFrame > 5 || wingFrame < -5)
-                wingDirection *= -1;
         }
 
         /// <summary>
-        /// Kuşu ekrana çizer.
+        /// Kuşu ekrana çizer. Görsel varsa resimle, yoksa kod ile çizer.
         /// </summary>
         public void Draw(Graphics g)
         {
-            // Dönüş açısı hesapla
+            // Dönüş açısı hesapla (velocity'ye göre)
             float angle = Velocity * 3f;
             angle = Math.Max(-25, Math.Min(angle, 70));
 
-            g.TranslateTransform(X + Width / 2f, Y + Height / 2f);
-            g.RotateTransform(angle);
-            g.TranslateTransform(-(X + Width / 2f), -(Y + Height / 2f));
+            // Dönüş merkezi
+            float cx = X + Width / 2f;
+            float cy = Y + Height / 2f;
 
-            // Gövde (sarı)
-            using (var bodyBrush = new SolidBrush(Color.FromArgb(255, 200, 50)))
+            g.TranslateTransform(cx, cy);
+            g.RotateTransform(angle);
+            g.TranslateTransform(-cx, -cy);
+
+            if (birdImage != null)
+            {
+                // Resimle çiz
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(birdImage, X, Y, Width, Height);
+            }
+            else
+            {
+                // Yedek: kod ile çizim (görsel bulunamazsa)
+                DrawFallback(g);
+            }
+
+            g.ResetTransform();
+        }
+
+        /// <summary>
+        /// Görsel yüklenemediğinde yedek olarak kod ile kuş çizer.
+        /// </summary>
+        private void DrawFallback(Graphics g)
+        {
+            // Gövde (pembe - yüklenen görsele benzer)
+            using (var bodyBrush = new SolidBrush(Color.FromArgb(230, 150, 170)))
             {
                 g.FillEllipse(bodyBrush, X, Y, Width, Height);
             }
 
-            // Karın (açık sarı)
-            using (var bellyBrush = new SolidBrush(Color.FromArgb(255, 230, 120)))
+            // Dış çerçeve (siyah)
+            using (var outlinePen = new Pen(Color.Black, 2.5f))
             {
-                g.FillEllipse(bellyBrush, X + 8, Y + 8, Width - 14, Height - 10);
+                g.DrawEllipse(outlinePen, X, Y, Width, Height);
             }
 
-            // Kanat (turuncu)
-            float wingOffset = wingFrame * 1.5f;
-            using (var wingBrush = new SolidBrush(Color.FromArgb(230, 140, 40)))
-            {
-                g.FillEllipse(wingBrush, X + 2, Y + 6 + wingOffset, 14, 10);
-            }
-
-            // Göz (beyaz daire)
+            // Göz (beyaz daire - büyük)
             using (var eyeWhiteBrush = new SolidBrush(Color.White))
             {
-                g.FillEllipse(eyeWhiteBrush, X + Width - 14, Y + 2, 12, 12);
+                g.FillEllipse(eyeWhiteBrush, X + Width - 22, Y + 2, 14, 16);
+                g.FillEllipse(eyeWhiteBrush, X + Width - 14, Y + 4, 14, 16);
+            }
+
+            // Göz çerçevesi
+            using (var eyeOutline = new Pen(Color.Black, 2f))
+            {
+                g.DrawEllipse(eyeOutline, X + Width - 22, Y + 2, 14, 16);
+                g.DrawEllipse(eyeOutline, X + Width - 14, Y + 4, 14, 16);
             }
 
             // Göz bebeği (siyah)
-            using (var eyeBlackBrush = new SolidBrush(Color.FromArgb(44, 62, 80)))
+            using (var eyeBlackBrush = new SolidBrush(Color.Black))
             {
-                g.FillEllipse(eyeBlackBrush, X + Width - 10, Y + 4, 6, 6);
+                g.FillEllipse(eyeBlackBrush, X + Width - 16, Y + 8, 5, 6);
+                g.FillEllipse(eyeBlackBrush, X + Width - 8, Y + 10, 5, 6);
             }
 
-            // Gaga (kırmızı üçgen)
-            using (var beakBrush = new SolidBrush(Color.FromArgb(230, 75, 60)))
+            // Gaga (turuncu)
+            using (var beakBrush = new SolidBrush(Color.FromArgb(240, 140, 50)))
             {
                 PointF[] beak = {
-                    new PointF(X + Width - 2, Y + 10),
-                    new PointF(X + Width + 10, Y + 14),
-                    new PointF(X + Width - 2, Y + 18)
+                    new PointF(X + Width - 2, Y + Height / 2f - 2),
+                    new PointF(X + Width + 10, Y + Height / 2f + 2),
+                    new PointF(X + Width - 2, Y + Height / 2f + 6)
                 };
                 g.FillPolygon(beakBrush, beak);
             }
 
-            g.ResetTransform();
+            // Kuyruk (siyah)
+            using (var tailBrush = new SolidBrush(Color.Black))
+            {
+                PointF[] tail = {
+                    new PointF(X + 5, Y + 8),
+                    new PointF(X - 10, Y + 2),
+                    new PointF(X - 8, Y + 10),
+                    new PointF(X - 12, Y + 16),
+                    new PointF(X + 5, Y + 14)
+                };
+                g.FillPolygon(tailBrush, tail);
+            }
         }
 
         /// <summary>
@@ -144,7 +203,6 @@ namespace FlappyBird
             Y = startY;
             Velocity = 0;
             IsAlive = true;
-            wingFrame = 0;
         }
     }
 }
