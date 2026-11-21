@@ -15,6 +15,7 @@ Bu proje, Windows Forms üzerinde zamanlayıcı (Timer) ve klavye olaylarının 
 
 ## 🚀 Kurulum ve Çalıştırma
 
+### 1. Windows Forms (C# / .NET) - Ana Proje
 1. Bu depoyu klonlayın:
    ```bash
    git clone https://github.com/meryemmelek41-mm/YMH219-FlappyBird.git
@@ -24,11 +25,16 @@ Bu proje, Windows Forms üzerinde zamanlayıcı (Timer) ve klavye olaylarının 
 
 **Gereksinimler:**
 - Visual Studio 2022 veya üzeri
-- .NET 6.0 SDK
+- .NET 6.0 SDK (Windows Forms desteği ile)
+
+### 2. Web / HTML5 Önizleme (Tarayıcıda Anında Oynama)
+Windows ortamı olmayan veya oyunu doğrudan tarayıcıda denemek isteyenler için:
+- Projedeki `preview/index.html` dosyasını herhangi bir internet tarayıcısında (Chrome, Edge, Safari, Firefox) çift tıklayarak açmanız yeterlidir.
 
 ## 🎮 Temel Özellikler
 
-- **Kuş Kontrolü:** SPACE veya Yukarı Ok tuşu ile kuş yukarı zıplar; yer çekimi etkisiyle aşağı iner.
+- **Kuş Kontrolü:** SPACE veya Yukarı Ok tuşu (veya fare tıklaması) ile kuş yukarı zıplar; yer çekimi etkisiyle aşağı iner.
+- **Özel Kuş Görseli:** Yüklenen pembe kuş görseli projeye gömülü kaynak olarak entegre edilmiştir.
 - **Engeller:** Borular ekranın sağından sola doğru hareket eder; ekran dışına çıkan borular otomatik olarak yeniden oluşturulur.
 - **Çarpışma Kontrolü:** Kuş borulara, zemine veya tavana çarptığında oyun durur ve "Game Over" ekranı gösterilir.
 - **Skor Sistemi:** Her başarılı boru geçişinde skor artar.
@@ -39,27 +45,35 @@ Bu proje, Windows Forms üzerinde zamanlayıcı (Timer) ve klavye olaylarının 
 ## 🏗️ Proje Yapısı
 
 ```
-FlappyBird/
-├── FlappyBird.sln            # Solution dosyası
-├── .gitignore                # Git ignore kuralları
-├── README.md                 # Bu dosya
+YMH219-FlappyBird/
+├── FlappyBird.sln              # Visual Studio Solution dosyası
+├── .gitignore                  # Git ignore kuralları
+├── README.md                   # Proje dokümantasyonu
+├── preview/                    # Web / HTML5 oynanabilir önizleme sürümü
+│   ├── index.html              # Tarayıcı oyunu
+│   └── bird.png                # Pembe kuş görseli
 └── FlappyBird/
-    ├── FlappyBird.csproj     # Proje dosyası
-    ├── Program.cs            # Ana giriş noktası
-    ├── FormMain.cs           # Ana form - oyun döngüsü ve çizim
-    ├── FormMain.Designer.cs  # Form tasarım dosyası
-    ├── Bird.cs               # Kuş sınıfı (konum, fizik, çizim)
-    ├── Pipe.cs               # Boru sınıfı (engel yönetimi)
-    └── GameState.cs          # Oyun durumu sınıfı (skor, durum)
+    ├── FlappyBird.csproj       # Proje dosyası (.NET 6.0 WinForms)
+    ├── Program.cs              # Ana giriş noktası
+    ├── FormMain.cs             # Ana form - oyun döngüsü ve çizim
+    ├── FormMain.Designer.cs    # Form tasarım dosyası
+    ├── Bird.cs                 # Kuş sınıfı (konum, fizik, görsel çizim)
+    ├── Pipe.cs                 # Boru sınıfı (engel yönetimi)
+    ├── GameState.cs            # Oyun durumu sınıfı (skor, durum)
+    ├── Resources/
+    │   └── bird.png            # C# projesine gömülü kuş görseli
+    └── screenshots/
+        ├── menu.png            # Menü ekran görüntüsü
+        └── gameplay.png        # Oynanış ekran görüntüsü
 ```
 
 ## 📸 Ekran Görüntüleri
 
 ### Oyun Menüsü
-*(Oyun başlatıldığında görülen ana menü ekranı)*
+![Oyun Menüsü](FlappyBird/screenshots/menu.png)
 
 ### Oynanış
-*(Boruların arasından geçerken oyun ekranı)*
+![Oynanış](FlappyBird/screenshots/gameplay.png)
 
 ## ⚙️ Nesne Tabanlı Tasarım
 
