@@ -2,6 +2,8 @@
 
 **Nesne Tabanlı Programlama (YMH 219)** dersi kapsamında geliştirilen Windows Forms tabanlı Flappy Bird oyunu.
 
+🎮 **Canlı Demo (Tarayıcıda Hemen Oyna):** [https://meryemmelek41-mm.github.io/YMH219-FlappyBird/](https://meryemmelek41-mm.github.io/YMH219-FlappyBird/)
+
 ## 📋 Proje Hakkında
 
 Bu proje, Windows Forms üzerinde zamanlayıcı (Timer) ve klavye olaylarının kullanıldığı basit bir 2D oyundur. Görsel bileşenler çalışma zamanında hareket ettirilmekte, çarpışma kontrolü ve oyun durumu nesne tabanlı bir yapı ile yönetilmektedir.
